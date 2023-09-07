@@ -6,12 +6,9 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"regexp"
-	"strings"
+
 	"sync"
 )
-
-var re = regexp.MustCompile("[\u001B\u009B][[\\]()#;?]*(?:(?:(?:[a-zA-Z\\d]*(?:;[a-zA-Z\\d]*)*)?\u0007)|(?:(?:\\d{1,4}(?:;\\d{0,4})*)?[\\dA-PRZcf-ntqry=><~]))")
 
 func main() {
 	config := tls.Config{Certificates: []tls.Certificate{}, InsecureSkipVerify: false}
@@ -28,9 +25,9 @@ func main() {
 	go func() {
 		defer wg.Done()
 		scanner := bufio.NewScanner(conn)
+		scanner.Split(bufio.ScanRunes)
 		for scanner.Scan() {
-			line := strings.TrimSpace(re.ReplaceAllString(scanner.Text(), ""))
-			fmt.Println(line)
+			fmt.Print(scanner.Text())
 		}
 	}()
 
